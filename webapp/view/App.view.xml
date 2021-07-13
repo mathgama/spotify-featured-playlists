@@ -1,16 +1,106 @@
 <mvc:View
     controllerName="ifoodfrontendtest.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
+		xmlns:f="sap.f" 
+		xmlns:fb="sap.ui.comp.filterbar"
+		xmlns:core="sap.ui.core" 
     displayBlock="true"
-    xmlns="sap.m"
+		xmlns="sap.m"
 >
-	<Shell id="shell">
-		<App id="app">
-			<pages>
-				<Page id="page" title="{i18n>title}">
-					<content />
-				</Page>
-			</pages>
-		</App>
-	</Shell>
+	<App>
+		<Page>
+			<customHeader>
+				<f:ShellBar core:require="{ Helper: 'ifoodfrontendtest/util/Helper' }" title="{i18n>appTitle}" homeIcon="{:= Helper.resolvePath('./img/logo_ui5.png') }" />
+			</customHeader>
+			<content>
+				<f:DynamicPage>
+					<f:header>
+						<f:DynamicPageHeader pinnable="false">
+							<fb:FilterBar id="api_filter_bar" reset="onReset" showRestoreButton="true" showClearButton="true">
+							</fb:FilterBar>
+							<!-- API Filters -->
+							<!--
+							<Label text="Locale" labelFor="localeInput" />
+							<Input
+								id="localeInput"
+								placeholder="Enter locale"
+								showSuggestion="true"
+								showValueHelp="true"
+								valueHelpRequest=".onValueHelpRequest"
+								suggestionItems="{/localeCollection}">
+								<suggestionItems>
+									<core:Item text="{name}" />
+								</suggestionItems>
+							</Input>
+							-->
+						</f:DynamicPageHeader>
+					</f:header>
+					<f:content>
+
+						<List id="playlistList"
+							items="{ path: '/playlists' }"
+							mode="None"
+							growing="true"
+							growingScrollToLoad="true"
+							showNoData="false"
+							showSeparators="None">
+							<headerToolbar>
+								<OverflowToolbar class="sapUiSizeCompact" visible="{= !${view>/isMobile} }">
+									<ToolbarSpacer />
+									<SearchField id="searchTodoItemsInput" liveChange=".onSearch" width="20rem"/>
+									<!--
+									<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
+										<items>
+											<SegmentedButtonItem text="{i18n>LABEL_ALL}" key="all"/>
+											<SegmentedButtonItem text="{i18n>LABEL_ACTIVE}" key="active"/>
+											<SegmentedButtonItem text="{i18n>LABEL_COMPLETED}" key="completed"/>
+										</items>
+									</SegmentedButton>
+									<Button id="clearCompleted" enabled="{/itemsRemovable}" icon="sap-icon://delete" text="{i18n>CLEAR_COMPLETED}" press=".clearCompleted"/>
+									-->
+								</OverflowToolbar>
+							</headerToolbar>
+							<infoToolbar>
+								<OverflowToolbar
+									visible="{= !!${view>/filterText} }"
+									active="false">
+									<Label text="{view>/filterText}" />
+								</OverflowToolbar>
+							</infoToolbar>
+							<CustomListItem>
+								<HBox>
+									<VBox justifyContent="Center">
+										<Text text="{title}"/>
+									</VBox>
+								</HBox>
+								<!--
+								<customData>
+									<core:CustomData key="todo-item-completed" value="{= String(${completed})}" writeToDom="true" />
+								</customData>
+								-->
+							</CustomListItem>
+						</List>
+
+					</f:content>
+				</f:DynamicPage>
+			</content>
+
+			<!-- [TODO] Incluir barra de pesquisa mobile
+			<footer>
+				<OverflowToolbar visible="{= !!${view>/isMobile} }">
+					<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
+						<items>
+							<SegmentedButtonItem text="All" key="all"/>
+							<SegmentedButtonItem text="Active" key="active"/>
+							<SegmentedButtonItem text="Completed" key="completed"/>
+						</items>
+					</SegmentedButton>
+					<ToolbarSpacer />
+					<Button id="clearCompleted-footer" enabled="{/itemsRemovable}" icon="sap-icon://delete" text="{i18n>CLEAR_COMPLETED}" press=".clearCompleted"/>
+				</OverflowToolbar>
+			</footer>
+			-->
+
+		</Page>
+	</App>
 </mvc:View>

@@ -66,7 +66,7 @@ sap.ui.define([
 						oControl = new sap.m.DateTimePicker(filter.id);
 					else
 						oControl = new sap.m.Input(filter.id, {
-							type: sInputType,
+							type: sInputType
 						});
 				}
 
@@ -126,13 +126,30 @@ sap.ui.define([
 		},
 		*/
 
+		onFBSearch: function(oEvent) {
+
+			$.ajax({
+				url: "https://api.spotify.com/v1/browse/featured-playlists",
+				method: "GET",
+				headers: {
+					"Authorization": "Bearer {$code}"
+				},
+				data: {
+					"country": "SE",
+					"limit": "2"
+				},
+				success: function(sResult) {
+					debugger;			
+				}
+			
+			});
+		},
+
 		/**
 		 * Trigger search for specific items. The removal of items is disable as long as the search is used.
 		 * @param {sap.ui.base.Event} oEvent Input changed event
 		 */
 		onSearch: function(oEvent) {
-			var oModel = this.getView().getModel();
-
 			// First reset current filters
 			this.aSearchFilters = [];
 

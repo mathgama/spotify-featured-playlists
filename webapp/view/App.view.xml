@@ -16,7 +16,7 @@
 				<f:DynamicPage>
 					<f:header>
 						<f:DynamicPageHeader pinnable="false">
-							<fb:FilterBar id="api_filter_bar" reset="onReset" showRestoreButton="true" showClearButton="true">
+							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" search="onFBSearch">
 							</fb:FilterBar>
 						</f:DynamicPageHeader>
 					</f:header>

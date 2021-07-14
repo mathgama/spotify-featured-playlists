@@ -18,21 +18,6 @@
 						<f:DynamicPageHeader pinnable="false">
 							<fb:FilterBar id="api_filter_bar" reset="onReset" showRestoreButton="true" showClearButton="true">
 							</fb:FilterBar>
-							<!-- API Filters -->
-							<!--
-							<Label text="Locale" labelFor="localeInput" />
-							<Input
-								id="localeInput"
-								placeholder="Enter locale"
-								showSuggestion="true"
-								showValueHelp="true"
-								valueHelpRequest=".onValueHelpRequest"
-								suggestionItems="{/localeCollection}">
-								<suggestionItems>
-									<core:Item text="{name}" />
-								</suggestionItems>
-							</Input>
-							-->
 						</f:DynamicPageHeader>
 					</f:header>
 					<f:content>

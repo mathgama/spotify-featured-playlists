@@ -23,26 +23,56 @@ sap.ui.define([
 				"http://www.mocky.io/v2/5a25fade2e0000213aa90776"
 			), "filters");
 
-			this.getView().getModel("filters").attachRequestCompleted(function(response) {
-				debugger;
+			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
+		},
 
-				var oFilterBar = this.byId("api_filter_bar");
-				var oFilterItem;
-				
-				for(const filter of response.oSource.oData.filters) {
-					oFilterItem = new sap.ui.comp.filterbar.FilterGroupItem({
-						groupName: "Unique",
-						name: filter.id,
-						label: filter.name,
-						partOfCurrentVariant: true,
-						visibleInFilterBar: true
-					});
+		_buildDynamicFilterBar: function(response) {
+			var oFilterBar = this.byId("api_filter_bar");
+			var oFilterItem, oControl;
+			
+			for(const filter of response.oSource.oData.filters) {
+				oFilterItem = new sap.ui.comp.filterbar.FilterGroupItem({
+					groupName: "Unique",
+					name: filter.id,
+					label: filter.name,
+					partOfCurrentVariant: true,
+					visibleInFilterBar: true
+				});
 
-					oFilterItem.setControl( new sap.m.Input( {type: "Text"} ) );
-					oFilterBar.addFilterGroupItem(oFilterItem);
+				if(filter.values) {
+					oControl = new sap.m.ComboBox(filter.id);
+
+					for(const option of filter.values) {
+						oControl.addItem( new sap.ui.core.Item({
+							key: option.value,
+							text: option.name
+						}) );
+					}
+				} else {
+					var sInputType;
+
+					switch(filter.validation.primitiveType) {
+						case "STRING": 
+							sInputType = "Text";
+							break;
+						case "INTEGER":
+							sInputType = "Number";
+							break;
+						default:
+							sInputType = "Text";
+					}
+
+					if(filter.validation.entityType == "DATE_TIME")
+						oControl = new sap.m.DateTimePicker(filter.id);
+					else
+						oControl = new sap.m.Input(filter.id, {
+							type: sInputType,
+						});
 				}
 
-			}, this);
+				oFilterItem.setControl(oControl);
+				oFilterBar.addFilterGroupItem(oFilterItem);
+			}
 		},
 
 		/**

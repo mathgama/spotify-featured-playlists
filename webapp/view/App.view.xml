@@ -68,7 +68,16 @@
 
 					</f:content>
 				</f:DynamicPage>
+
 			</content>
+
+			<footer>
+				<OverflowToolbar>
+					<Button 
+						press="onLoginPress"
+						text="Login Spotify" />
+				</OverflowToolbar>
+			</footer>
 
 			<!-- [TODO] Incluir barra de pesquisa mobile
 			<footer>

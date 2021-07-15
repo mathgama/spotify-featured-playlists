@@ -1,11 +1,12 @@
 sap.ui.define([
 	"sap/ui/Device",
+	"sap/base/util/UriParameters",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/json/JSONModel"
-], function(Device, Controller, Fragment, Filter, FilterOperator, JSONModel) {
+], function(Device, UriParameters, Controller, Fragment, Filter, FilterOperator, JSONModel) {
 	"use strict";
 
 	return Controller.extend("ifood.controller.App", {
@@ -24,6 +25,21 @@ sap.ui.define([
 			), "filters");
 
 			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
+
+			if(window.location.hash) // [TODO] Tem uma forma melhor do que deixar isso global?
+				this.sSpotifyParameters = this._getReturnedParametersFromSpotify(window.location.hash);
+		},
+
+		_getReturnedParametersFromSpotify: function(hash) {
+			const sStringAfterHash = hash.substring(1);
+			const sParamsInUrl = sStringAfterHash.split("&");
+			const sParamsSplitUp = sParamsInUrl.reduce((accumulator, currentValue) => {
+				const [key, value] = currentValue.split("=");
+				accumulator[key] = value;
+				return accumulator;
+			}, {});
+
+			return sParamsSplitUp;
 		},
 
 		_buildDynamicFilterBar: function(response) {
@@ -132,11 +148,12 @@ sap.ui.define([
 				url: "https://api.spotify.com/v1/browse/featured-playlists",
 				method: "GET",
 				headers: {
-					"Authorization": "Bearer {$code}"
+					"Authorization": `Bearer ${this.sSpotifyParameters.access_token}`
 				},
 				data: {
-					"country": "SE",
-					"limit": "2"
+					"locale": "pt_BR",
+					"country": "BR",
+					"limit": "5"
 				},
 				success: function(sResult) {
 					debugger;			
@@ -248,6 +265,16 @@ sap.ui.define([
 
       this.byId("localeInput").setValue(oSelectedItem.getTitle());
     },
+
+		onLoginPress: function(oEvent) {
+			const endpointUrl = "https://accounts.spotify.com/authorize";
+			const clientId = "16e8f02bf37d4aa9abf7d881e396733e";
+			const redirectUri = "http://localhost:8080/index.html";
+			
+			//[TODO] Gerar um state aleatório
+			window.location = `${endpointUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&state=123`;
+			
+		}
 
 	});
 

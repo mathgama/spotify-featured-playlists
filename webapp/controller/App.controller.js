@@ -1,12 +1,10 @@
 sap.ui.define([
 	"sap/ui/Device",
-	"sap/base/util/UriParameters",
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/core/Fragment",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/json/JSONModel"
-], function(Device, UriParameters, Controller, Fragment, Filter, FilterOperator, JSONModel) {
+], function(Device, Controller, Filter, FilterOperator, JSONModel) {
 	"use strict";
 
 	return Controller.extend("ifood.controller.App", {
@@ -26,8 +24,11 @@ sap.ui.define([
 
 			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
 
-			if(window.location.hash) // [TODO] Tem uma forma melhor do que deixar isso global?
-				this.sSpotifyParameters = this._getReturnedParametersFromSpotify(window.location.hash);
+			if(window.location.hash) {
+				const sSpotifyParameters = this._getReturnedParametersFromSpotify(window.location.hash);
+				this.getView().getModel("user").setProperty("/spotifyParameters", sSpotifyParameters);
+				this._spotifyAPICall();
+			}
 		},
 
 		_getReturnedParametersFromSpotify: function(hash) {
@@ -56,7 +57,9 @@ sap.ui.define([
 				});
 
 				if(filter.values) {
-					oControl = new sap.m.ComboBox(filter.id);
+					oControl = new sap.m.ComboBox(filter.id, {
+						selectedKey: `{filters>/${filter.id}}`
+					});
 
 					for(const option of filter.values) {
 						oControl.addItem( new sap.ui.core.Item({
@@ -79,10 +82,13 @@ sap.ui.define([
 					}
 
 					if(filter.validation.entityType == "DATE_TIME")
-						oControl = new sap.m.DateTimePicker(filter.id);
+						oControl = new sap.m.DateTimePicker(filter.id, {
+							value: `{filters>/${filter.id}}`
+						});
 					else
 						oControl = new sap.m.Input(filter.id, {
-							type: sInputType
+							type: sInputType,
+							value: `{filters>/${filter.id}}`
 						});
 				}
 
@@ -91,70 +97,37 @@ sap.ui.define([
 			}
 		},
 
-		/**
-		 * Adds a new todo item to the bottom of the list.
-		 
-		addTodo: function() {
-			var oModel = this.getView().getModel();
-			var aTodos = oModel.getProperty("/todos").map(function (oTodo) { return Object.assign({}, oTodo); });
-
-			aTodos.push({
-				title: oModel.getProperty("/newTodo"),
-				completed: false
-			});
-
-			oModel.setProperty("/todos", aTodos);
-			oModel.setProperty("/newTodo", "");
-		},
-		*/
-
-		/**
-		 * Removes all completed items from the todo list.
-		 
-		clearCompleted: function() {
-			var oModel = this.getView().getModel();
-			var aTodos = oModel.getProperty("/todos").map(function (oTodo) { return Object.assign({}, oTodo); });
-
-			var i = aTodos.length;
-			while (i--) {
-				var oTodo = aTodos[i];
-				if (oTodo.completed) {
-					aTodos.splice(i, 1);
-				}
-			}
-
-			oModel.setProperty("/todos", aTodos);
-		},
-		*/
-
-		/**
-		 * Updates the number of items not yet completed
-		 
-		updateItemsLeftCount: function() {
-			var oModel = this.getView().getModel();
-			var aTodos = oModel.getProperty("/todos") || [];
-
-			var iItemsLeft = aTodos.filter(function(oTodo) {
-				return oTodo.completed !== true;
-			}).length;
-
-			oModel.setProperty("/itemsLeftCount", iItemsLeft);
-		},
-		*/
-
 		onFBSearch: function(oEvent) {
+			this._spotifyAPICall();
+		},
+
+		_spotifyAPICall: function() {
+			const oModelFilters = this.getView().getModel("filters");
+			const oFilterParams = {};
+
+			// [TODO] Melhorar forma de fazer isso
+			if(oModelFilters.getProperty("/locale"))
+				oFilterParams["locale"] = oModelFilters.getProperty("/locale");
+
+			if(oModelFilters.getProperty("/country"))
+				oFilterParams["country"] = oModelFilters.getProperty("/country");
+
+			if(oModelFilters.getProperty("/limit"))
+				oFilterParams["limit"] = oModelFilters.getProperty("/limit");
+
+			if(oModelFilters.getProperty("/timestamp"))
+				oFilterParams["timestamp"] = oModelFilters.getProperty("/timestamp");
+
+			if(oModelFilters.getProperty("/offset"))
+				oFilterParams["offset"] = oModelFilters.getProperty("/offset");
 
 			$.ajax({
 				url: "https://api.spotify.com/v1/browse/featured-playlists",
 				method: "GET",
 				headers: {
-					"Authorization": `Bearer ${this.sSpotifyParameters.access_token}`
+					"Authorization": `Bearer ${this.getView().getModel("user").getProperty("/spotifyParameters").access_token}`
 				},
-				data: {
-					"locale": "pt_BR",
-					"country": "BR",
-					"limit": "5"
-				},
+				data: oFilterParams,
 				success: function(sResult) {
 					debugger;			
 				}
@@ -162,10 +135,6 @@ sap.ui.define([
 			});
 		},
 
-		/**
-		 * Trigger search for specific items. The removal of items is disable as long as the search is used.
-		 * @param {sap.ui.base.Event} oEvent Input changed event
-		 */
 		onSearch: function(oEvent) {
 			// First reset current filters
 			this.aSearchFilters = [];
@@ -180,36 +149,10 @@ sap.ui.define([
 			this._applyListFilters();
 		},
 
-		/*
-		onFilter: function(oEvent) {
-			// First reset current filters
-			this.aTabFilters = [];
-
-			// add filter for search
-			this.sFilterKey = oEvent.getParameter("item").getKey();
-
-			// eslint-disable-line default-case
-			switch (this.sFilterKey) {
-				case "active":
-					this.aTabFilters.push(new Filter("completed", FilterOperator.EQ, false));
-					break;
-				case "completed":
-					this.aTabFilters.push(new Filter("completed", FilterOperator.EQ, true));
-					break;
-				case "all":
-				default:
-					// Don't use any filter
-			}
-
-			this._applyListFilters();
-		},
-		*/
-
 		_applyListFilters: function() {
 			var oList = this.byId("playlistList");
 			var oBinding = oList.getBinding("items");
 
-			//oBinding.filter(this.aSearchFilters.concat(this.aTabFilters), "todos");
 			oBinding.filter(this.aSearchFilters, "playlists");
 
 			var sI18nKey;
@@ -226,54 +169,12 @@ sap.ui.define([
 			this.getView().getModel("view").setProperty("/filterText", sFilterText);
 		},
 
-		onValueHelpRequest: function (oEvent) {
-			var sInputValue = oEvent.getSource().getValue(),
-				oView = this.getView();
-
-			if (!this._pValueHelpDialog) {
-				this._pValueHelpDialog = Fragment.load({
-					id: oView.getId(),
-					name: "ifood.view.ValueHelpDialog",
-					controller: this
-				}).then(function (oDialog) {
-					oView.addDependent(oDialog);
-					return oDialog;
-				});
-			}
-			this._pValueHelpDialog.then(function(oDialog) {
-				// Create a filter for the binding
-				oDialog.getBinding("items").filter([new Filter("name", FilterOperator.Contains, sInputValue)]);
-				// Open ValueHelpDialog filtered by the input's value
-				oDialog.open(sInputValue);
-			});
-		},
-
-		onValueHelpSearch: function (oEvent) {
-      var sValue = oEvent.getParameter("value");
-      var oFilter = new Filter("name", FilterOperator.Contains, sValue);
-
-      oEvent.getSource().getBinding("items").filter([oFilter]);
-    },
-
-    onValueHelpClose: function (oEvent) {
-      var oSelectedItem = oEvent.getParameter("selectedItem");
-      oEvent.getSource().getBinding("items").filter([]);
-
-      if (!oSelectedItem) {
-        return;
-      }
-
-      this.byId("localeInput").setValue(oSelectedItem.getTitle());
-    },
-
 		onLoginPress: function(oEvent) {
 			const endpointUrl = "https://accounts.spotify.com/authorize";
 			const clientId = "16e8f02bf37d4aa9abf7d881e396733e";
 			const redirectUri = "http://localhost:8080/index.html";
 			
-			//[TODO] Gerar um state aleatório
-			window.location = `${endpointUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&state=123`;
-			
+			window.location = `${endpointUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token`;
 		}
 
 	});

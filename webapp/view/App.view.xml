@@ -33,16 +33,6 @@
 								<OverflowToolbar class="sapUiSizeCompact" visible="{= !${view>/isMobile} }">
 									<ToolbarSpacer />
 									<SearchField id="searchTodoItemsInput" liveChange=".onSearch" width="20rem"/>
-									<!--
-									<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
-										<items>
-											<SegmentedButtonItem text="{i18n>LABEL_ALL}" key="all"/>
-											<SegmentedButtonItem text="{i18n>LABEL_ACTIVE}" key="active"/>
-											<SegmentedButtonItem text="{i18n>LABEL_COMPLETED}" key="completed"/>
-										</items>
-									</SegmentedButton>
-									<Button id="clearCompleted" enabled="{/itemsRemovable}" icon="sap-icon://delete" text="{i18n>CLEAR_COMPLETED}" press=".clearCompleted"/>
-									-->
 								</OverflowToolbar>
 							</headerToolbar>
 							<infoToolbar>
@@ -58,11 +48,6 @@
 										<Text text="{title}"/>
 									</VBox>
 								</HBox>
-								<!--
-								<customData>
-									<core:CustomData key="todo-item-completed" value="{= String(${completed})}" writeToDom="true" />
-								</customData>
-								-->
 							</CustomListItem>
 						</List>
 
@@ -78,22 +63,6 @@
 						text="Login Spotify" />
 				</OverflowToolbar>
 			</footer>
-
-			<!-- [TODO] Incluir barra de pesquisa mobile
-			<footer>
-				<OverflowToolbar visible="{= !!${view>/isMobile} }">
-					<SegmentedButton selectedKey="all" selectionChange=".onFilter" class="sapMSegmentedButtonNoAutoWidth">
-						<items>
-							<SegmentedButtonItem text="All" key="all"/>
-							<SegmentedButtonItem text="Active" key="active"/>
-							<SegmentedButtonItem text="Completed" key="completed"/>
-						</items>
-					</SegmentedButton>
-					<ToolbarSpacer />
-					<Button id="clearCompleted-footer" enabled="{/itemsRemovable}" icon="sap-icon://delete" text="{i18n>CLEAR_COMPLETED}" press=".clearCompleted"/>
-				</OverflowToolbar>
-			</footer>
-			-->
 
 		</Page>
 	</App>

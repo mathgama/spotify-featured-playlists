@@ -24,7 +24,7 @@
 
 						<List id="playlistList"
 							items="{ path: 'playlists>/items' }"
-							mode="None"
+							mode="SingleSelectMaster"
 							growing="true"
 							growingScrollToLoad="true"
 							showNoData="false"
@@ -42,13 +42,12 @@
 									<Label text="{view>/filterText}" />
 								</OverflowToolbar>
 							</infoToolbar>
-							<CustomListItem>
-								<HBox>
-									<VBox justifyContent="Center">
-										<Text text="{playlists>name}"/>
-									</VBox>
-								</HBox>
-							</CustomListItem>
+							<StandardListItem
+								title="{playlists>name}"
+								description="{playlists>description}"
+								icon="{playlists>images/0/url}"
+								iconDensityAware="false"
+								iconInset="false" />
 						</List>
 
 					</f:content>

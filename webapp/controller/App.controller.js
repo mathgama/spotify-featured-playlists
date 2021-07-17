@@ -141,7 +141,7 @@ sap.ui.define([
 			// add filter for search
 			this.sSearchQuery = oEvent.getSource().getValue();
 			if (this.sSearchQuery && this.sSearchQuery.length > 0) {
-				var filter = new Filter("title", FilterOperator.Contains, this.sSearchQuery);
+				var filter = new Filter("name", FilterOperator.Contains, this.sSearchQuery);
 				this.aSearchFilters.push(filter);
 			}
 

@@ -83,7 +83,8 @@ sap.ui.define([
 
 					if(filter.validation.entityType == "DATE_TIME")
 						oControl = new sap.m.DateTimePicker(filter.id, {
-							value: `{filters>/${filter.id}}`
+							value: `{filters>/${filter.id}}`,
+							valueFormat: "yyyy-MM-ddTHH:mm:ss"
 						});
 					else
 						oControl = new sap.m.Input(filter.id, {

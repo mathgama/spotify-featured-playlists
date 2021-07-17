@@ -57,8 +57,7 @@
         }
       },
       "": {
-        "type": "sap.ui.model.json.JSONModel",
-				"uri": "model/spotify.json"
+        "type": "sap.ui.model.json.JSONModel"
       },
       "user": {
         "type": "sap.ui.model.json.JSONModel"

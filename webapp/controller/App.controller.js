@@ -129,9 +129,8 @@ sap.ui.define([
 				},
 				data: oFilterParams,
 				success: function(sResult) {
-					debugger;			
-				}
-			
+					this.getView().setModel(new JSONModel(sResult.playlists), "playlists");
+				}.bind(this)
 			});
 		},
 

@@ -23,7 +23,7 @@
 					<f:content>
 
 						<List id="playlistList"
-							items="{ path: '/playlists' }"
+							items="{ path: 'playlists>/items' }"
 							mode="None"
 							growing="true"
 							growingScrollToLoad="true"
@@ -45,7 +45,7 @@
 							<CustomListItem>
 								<HBox>
 									<VBox justifyContent="Center">
-										<Text text="{title}"/>
+										<Text text="{playlists>name}"/>
 									</VBox>
 								</HBox>
 							</CustomListItem>

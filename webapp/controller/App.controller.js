@@ -1,10 +1,11 @@
 sap.ui.define([
 	"sap/ui/Device",
+	"sap/m/MessageToast",
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	"sap/ui/model/json/JSONModel"
-], function(Device, Controller, Filter, FilterOperator, JSONModel) {
+], function(Device, MessageToast, Controller, Filter, FilterOperator, JSONModel) {
 	"use strict";
 
 	return Controller.extend("spotifyfeaturedplaylists.controller.App", {
@@ -140,6 +141,11 @@ sap.ui.define([
 					this.getView().getModel("view").setProperty("/busy", false);
 				}.bind(this),
 				statusCode: {
+					400: function() {
+						this.getView().setModel(new JSONModel({}), "playlists");
+						MessageToast.show("Erro ao buscar informações para os parâmetros informados.");
+						this.getView().getModel("view").setProperty("/busy", false);
+					}.bind(this),
 					401: function() {
 						alert( "Erro ao se autenticar no Spotify." );
 						const redirectUri = "https://spotify-featured-playlists.cfapps.us10.hana.ondemand.com/webapp/";

@@ -103,7 +103,6 @@ sap.ui.define([
 		},
 
 		onFBSearch: function(oEvent) {
-			debugger;
 			this._spotifyAPICall();
 		},
 

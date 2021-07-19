@@ -16,7 +16,7 @@
 				<f:DynamicPage>
 					<f:header>
 						<f:DynamicPageHeader pinnable="false">
-							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" showGoOnFB="false" search="onFBSearch" >
+							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" showGoOnFB="false" search=".onFBSearch" >
 							</fb:FilterBar>
 						</f:DynamicPageHeader>
 					</f:header>
@@ -30,10 +30,10 @@
 							showNoData="false"
 							showSeparators="None">
 							<headerToolbar>
-								<OverflowToolbar class="sapUiSizeCompact" visible="{= !${view>/isMobile} }">
+								<Toolbar class="sapUiSizeCompact">
 									<ToolbarSpacer />
-									<SearchField id="searchTodoItemsInput" liveChange=".onSearch" width="20rem"/>
-								</OverflowToolbar>
+									<SearchField id="searchTodoItemsInput" liveChange=".onSearch" width="{= ${view>/isMobile} ? 'auto' : '20rem' }" />
+								</Toolbar>
 							</headerToolbar>
 							<infoToolbar>
 								<OverflowToolbar

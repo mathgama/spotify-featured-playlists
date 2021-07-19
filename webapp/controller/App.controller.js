@@ -24,7 +24,9 @@ sap.ui.define([
 
 			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
 
-			if(window.location.hash) {
+			if(!window.location.hash) {
+				this._spotifyAuth();
+			} else {
 				const sSpotifyParameters = this._getReturnedParametersFromSpotify(window.location.hash);
 				this.getView().getModel("user").setProperty("/spotifyParameters", sSpotifyParameters);
 				this._spotifyAPICall();
@@ -53,7 +55,7 @@ sap.ui.define([
 					name: filter.id,
 					label: filter.name,
 					partOfCurrentVariant: true,
-					visibleInFilterBar: true
+					visibleInFilterBar: true,
 				});
 
 				if(filter.values) {
@@ -93,12 +95,14 @@ sap.ui.define([
 						});
 				}
 
+				oControl.attachChange(this.onFBSearch, this);
 				oFilterItem.setControl(oControl);
 				oFilterBar.addFilterGroupItem(oFilterItem);
 			}
 		},
 
 		onFBSearch: function(oEvent) {
+			debugger;
 			this._spotifyAPICall();
 		},
 
@@ -131,7 +135,14 @@ sap.ui.define([
 				data: oFilterParams,
 				success: function(sResult) {
 					this.getView().setModel(new JSONModel(sResult.playlists), "playlists");
-				}.bind(this)
+				}.bind(this),
+				statusCode: {
+					401: function() {
+						alert( "Erro ao se autenticar no Spotify." );
+						const redirectUri = "http://localhost:8080/index.html";
+						window.location = redirectUri;
+					}
+				}
 			});
 		},
 
@@ -169,7 +180,7 @@ sap.ui.define([
 			this.getView().getModel("view").setProperty("/filterText", sFilterText);
 		},
 
-		onLoginPress: function(oEvent) {
+		_spotifyAuth: function(oEvent) {
 			const endpointUrl = "https://accounts.spotify.com/authorize";
 			const clientId = "16e8f02bf37d4aa9abf7d881e396733e";
 			const redirectUri = "http://localhost:8080/index.html";

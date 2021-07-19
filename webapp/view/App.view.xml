@@ -16,7 +16,7 @@
 				<f:DynamicPage>
 					<f:header>
 						<f:DynamicPageHeader pinnable="false">
-							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" search="onFBSearch">
+							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" showGoOnFB="false" search="onFBSearch" >
 							</fb:FilterBar>
 						</f:DynamicPageHeader>
 					</f:header>
@@ -52,17 +52,7 @@
 
 					</f:content>
 				</f:DynamicPage>
-
 			</content>
-
-			<footer>
-				<OverflowToolbar>
-					<Button 
-						press="onLoginPress"
-						text="Login Spotify" />
-				</OverflowToolbar>
-			</footer>
-
 		</Page>
 	</App>
 </mvc:View>

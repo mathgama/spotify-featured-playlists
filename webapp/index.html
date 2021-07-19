@@ -1,21 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="img/logo_spotify.png" rel="spotify icon" type="image/x-icon" />
         <title>Spotify Featured Playlists</title>
-        <script
-            id="sap-ui-bootstrap"
-            src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
-            data-sap-ui-theme="sap_fiori_3"
-            data-sap-ui-resourceroots='{"spotifyfeaturedplaylists": "./"}'
-            data-sap-ui-compatVersion="edge"
-            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
-            data-sap-ui-async="true"
-			data-sap-ui-preload="async"
-            data-sap-ui-frameOptions="trusted"
-        ></script>
+
     </head>
     <body class="sapUiBody">
         <div
@@ -24,5 +14,16 @@
             data-id="container"
             data-settings='{"id" : "spotify-featured-playlists"}'
         ></div>
+        <script
+        id="sap-ui-bootstrap"
+        src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_fiori_3"
+        data-sap-ui-resourceroots='{"spotifyfeaturedplaylists": "./"}'
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+        data-sap-ui-async="true"
+        data-sap-ui-preload="async"
+        data-sap-ui-frameOptions="trusted"
+    ></script>
     </body>
 </html>

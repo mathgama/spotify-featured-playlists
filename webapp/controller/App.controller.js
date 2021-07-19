@@ -16,6 +16,8 @@ sap.ui.define(
     const getModel = (model) => INSTANCE.getView().getModel(model)
     const setModel = (value, model) => INSTANCE.getView().setModel(new JSONModel(value), model)
     const setViewProperty = (prop, value) => getModel('view').setProperty(prop, value)
+    const setFilters = () => setModel(Settings.MOCK_FILTERS_URI, 'filters')
+    const setView = () => setModel(Settings.MOCK_FILTERS_URI, 'view')
 
     return Controller.extend('spotifyfeaturedplaylists.controller.App', {
       onInit: function () {
@@ -24,8 +26,8 @@ sap.ui.define(
         INSTANCE.searchFilters = []
         INSTANCE.aTabFilters = []
 
-        setModel({ isMobile: Device.browser.mobile, busy: false }, 'view')
-        setModel(Settings.MOCK_FILTERS_URI, 'filters')
+        setView({ isMobile: Device.browser.mobile, busy: false })
+        setFilters(Settings.MOCK_FILTERS_URI)
         getModel('filters').attachRequestCompleted(INSTANCE._buildDynamicFilterBar, this)
 
         if (!window.location.hash) {
@@ -73,19 +75,11 @@ sap.ui.define(
               )
             }
           } else {
-            let type
-
-            switch (filter.validation.primitiveType) {
-              case 'STRING':
-                type = 'Text'
-                break
-              case 'INTEGER':
-                type = 'Number'
-                break
-              default:
-                type = 'Text'
+            const map = {
+              STRING: 'text',
+              INTEGER: 'Number'
             }
-
+            let type = map[filter.validation.primitiveType] ?? map.text
             const value = `{filters>/${filter.id}}`
             const valueFormat = 'yyyy-MM-ddTHH:mm:ss'
 
@@ -133,7 +127,7 @@ sap.ui.define(
         setViewProperty('/busy', false)
       },
 
-      onSearch: function (oEvent) {
+      onSearch: (oEvent) => {
         // First reset current filters
         INSTANCE.searchFilters = []
 
@@ -153,15 +147,13 @@ sap.ui.define(
 
         oBinding.filter(INSTANCE.searchFilters, 'playlists')
 
-        let sFilterText
+        let filterText
         if (INSTANCE.sSearchQuery) {
-          let sI18nKey = 'itemsContaining'
-
-          var oResourceBundle = getModel('i18n').getResourceBundle()
-          sFilterText = oResourceBundle.getText(sI18nKey, [INSTANCE.sSearchQuery])
+          const oResourceBundle = getModel('i18n').getResourceBundle()
+          filterText = oResourceBundle.getText('itemsContaining', [INSTANCE.sSearchQuery])
         }
 
-        setViewProperty('/filterText', sFilterText)
+        setViewProperty('/filterText', filterText)
       },
 
       _spotifyAuth: () => {

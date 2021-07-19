@@ -9,7 +9,5 @@ const Settings = {
 sap.ui.define([], () => {
   'use strict'
 
-  return {
-    Settings
-  }
+  return { Settings }
 })

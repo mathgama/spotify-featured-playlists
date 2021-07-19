@@ -8,16 +8,16 @@
 |**Floorplan Used**<br>simple|
 |**Service Type**<br>None|
 |**Service URL**<br>N/A
-|**Module Name**<br>ifood-frontend-test|
-|**Application Title**<br>iFood - Featured Playlists|
+|**Module Name**<br>spotify-featured-playlists|
+|**Application Title**<br>Spotify Featured Playlists|
 |**Namespace**<br>|
 |**UI5 Theme**<br>sap_fiori_3|
 |**UI5 Version**<br>Latest|
 |**Enable Telemetry**<br>True|
 
-## ifood-frontend-test
+## spotify-featured-playlists
 
-iFood - Featured Playlists
+Spotify Featured Playlists
 
 ### Starting the generated app
 

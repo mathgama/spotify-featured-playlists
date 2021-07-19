@@ -16,7 +16,7 @@
 				<f:DynamicPage>
 					<f:header>
 						<f:DynamicPageHeader pinnable="false">
-							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" showGoOnFB="false" search=".onFBSearch" >
+							<fb:FilterBar id="api_filter_bar" showRestoreButton="false" showGoOnFB="false" search=".onFBSearch">
 							</fb:FilterBar>
 						</f:DynamicPageHeader>
 					</f:header>
@@ -28,7 +28,8 @@
 							growing="true"
 							growingScrollToLoad="true"
 							showNoData="false"
-							showSeparators="None">
+							showSeparators="None"
+							busy="{view>/busy}">
 							<headerToolbar>
 								<Toolbar class="sapUiSizeCompact">
 									<ToolbarSpacer />

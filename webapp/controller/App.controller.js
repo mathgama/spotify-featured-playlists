@@ -15,7 +15,8 @@ sap.ui.define([
 
 			this.getView().setModel(new JSONModel({
 				isMobile: Device.browser.mobile,
-				filterText: undefined
+				filterText: undefined,
+				busy: false
 			}), "view");
 
 			this.getView().setModel(new JSONModel(
@@ -107,6 +108,8 @@ sap.ui.define([
 		},
 
 		_spotifyAPICall: function() {
+			this.getView().getModel("view").setProperty("/busy", true);
+
 			const oModelFilters = this.getView().getModel("filters");
 			const oFilterParams = {};
 
@@ -135,6 +138,7 @@ sap.ui.define([
 				data: oFilterParams,
 				success: function(sResult) {
 					this.getView().setModel(new JSONModel(sResult.playlists), "playlists");
+					this.getView().getModel("view").setProperty("/busy", false);
 				}.bind(this),
 				statusCode: {
 					401: function() {

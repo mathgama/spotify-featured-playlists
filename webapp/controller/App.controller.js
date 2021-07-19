@@ -20,7 +20,7 @@ sap.ui.define([
 			}), "view");
 
 			this.getView().setModel(new JSONModel(
-				"http://www.mocky.io/v2/5a25fade2e0000213aa90776"
+				"https://www.mocky.io/v2/5a25fade2e0000213aa90776"
 			), "filters");
 
 			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
@@ -143,7 +143,7 @@ sap.ui.define([
 				statusCode: {
 					401: function() {
 						alert( "Erro ao se autenticar no Spotify." );
-						const redirectUri = "http://localhost:8080/index.html";
+						const redirectUri = "https://spotify-featured-playlists.cfapps.us10.hana.ondemand.com/webapp/";
 						window.location = redirectUri;
 					}
 				}
@@ -187,7 +187,7 @@ sap.ui.define([
 		_spotifyAuth: function(oEvent) {
 			const endpointUrl = "https://accounts.spotify.com/authorize";
 			const clientId = "16e8f02bf37d4aa9abf7d881e396733e";
-			const redirectUri = "http://localhost:8080/index.html";
+			const redirectUri = "http://spotify-featured-playlists.cfapps.us10.hana.ondemand.com/webapp/";
 			
 			window.location = `${endpointUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token`;
 		}

@@ -1,0 +1,5 @@
+applications:
+- name: spotify-featured-playlists
+  memory: 64M
+  buildpacks: 
+    - staticfile_buildpack

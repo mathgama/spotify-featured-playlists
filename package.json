@@ -1,8 +1,8 @@
 {
-	"name": "ifood-frontend-test",
+	"name": "spotify-featured-playlists",
 	"version": "0.0.1",
 	"private": true,
-	"description": "iFood - Featured Playlists",
+	"description": "Spotify - Featured Playlists",
 	"keywords": [
 		"ui5",
 		"openui5",

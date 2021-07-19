@@ -1,11 +1,11 @@
 sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/Device",
-	"ifoodfrontendtest/model/models"
+	"spotifyfeaturedplaylists/model/models"
 ], function (UIComponent, Device, models) {
 	"use strict";
 
-	return UIComponent.extend("ifoodfrontendtest.Component", {
+	return UIComponent.extend("spotifyfeaturedplaylists.Component", {
 
 		metadata: {
 			manifest: "json"

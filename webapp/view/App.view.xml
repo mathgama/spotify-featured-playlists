@@ -1,5 +1,5 @@
 <mvc:View
-    controllerName="ifoodfrontendtest.controller.App"
+    controllerName="spotifyfeaturedplaylists.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
 		xmlns:f="sap.f" 
 		xmlns:fb="sap.ui.comp.filterbar"
@@ -10,7 +10,7 @@
 	<App>
 		<Page>
 			<customHeader>
-				<f:ShellBar core:require="{ Helper: 'ifoodfrontendtest/util/Helper' }" title="{i18n>appTitle}" homeIcon="{:= Helper.resolvePath('./img/logo_spotify.png') }" />
+				<f:ShellBar core:require="{ Helper: 'spotifyfeaturedplaylists/util/Helper' }" title="{i18n>appTitle}" homeIcon="{:= Helper.resolvePath('./img/logo_spotify.png') }" />
 			</customHeader>
 			<content>
 				<f:DynamicPage>

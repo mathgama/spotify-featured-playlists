@@ -7,7 +7,7 @@ sap.ui.define([
 ], function(Device, Controller, Filter, FilterOperator, JSONModel) {
 	"use strict";
 
-	return Controller.extend("ifood.controller.App", {
+	return Controller.extend("spotifyfeaturedplaylists.controller.App", {
 
 		onInit: function() {
 			this.aSearchFilters = [];

@@ -1,202 +1,164 @@
-sap.ui.define([
-	"sap/ui/Device",
-	"sap/m/MessageToast",
-	"sap/ui/core/mvc/Controller",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/json/JSONModel"
-], function(Device, MessageToast, Controller, Filter, FilterOperator, JSONModel) {
-	"use strict";
+sap.ui.define(
+  [
+    'sap/ui/Device',
+    'sap/m/MessageToast',
+    'sap/ui/core/mvc/Controller',
+    'sap/ui/model/Filter',
+    'sap/ui/model/FilterOperator',
+    'sap/ui/model/json/JSONModel',
+    'spotifyfeaturedplaylists/util/Constants'
+  ],
+  (Device, MessageToast, Controller, Filter, FilterOperator, JSONModel, Constants) => {
+    'use strict'
+    let INSTANCE = {}
 
-	return Controller.extend("spotifyfeaturedplaylists.controller.App", {
+    const { Settings } = Constants
+    const getModel = (model) => INSTANCE.getView().getModel(model)
+    const setModel = (value, model) => INSTANCE.getView().setModel(new JSONModel(value), model)
+    const setViewProperty = (prop, value) => getModel('view').setProperty(prop, value)
+    const setFilters = () => setModel(Settings.MOCK_FILTERS_URI, 'filters')
+    const setView = () => setModel(Settings.MOCK_FILTERS_URI, 'view')
 
-		onInit: function() {
-			this.aSearchFilters = [];
-			this.aTabFilters = [];
+    return Controller.extend('spotifyfeaturedplaylists.controller.App', {
+      onInit: function () {
+        INSTANCE = this
 
-			this.getView().setModel(new JSONModel({
-				isMobile: Device.browser.mobile,
-				filterText: undefined,
-				busy: false
-			}), "view");
+        INSTANCE.searchFilters = []
+        INSTANCE.aTabFilters = []
 
-			this.getView().setModel(new JSONModel(
-				"https://www.mocky.io/v2/5a25fade2e0000213aa90776"
-			), "filters");
+        setView({ isMobile: Device.browser.mobile, busy: false })
+        setFilters(Settings.MOCK_FILTERS_URI)
+        getModel('filters').attachRequestCompleted(INSTANCE._buildDynamicFilterBar, this)
 
-			this.getView().getModel("filters").attachRequestCompleted(this._buildDynamicFilterBar, this);
+        if (!window.location.hash) {
+          INSTANCE._spotifyAuth()
+          return
+        }
+        const sSpotifyParameters = INSTANCE._getReturnedParametersFromSpotify(window.location.hash)
+        getModel('user').setProperty('/spotifyParameters', sSpotifyParameters)
+        INSTANCE._spotifyAPICall()
+      },
 
-			if(!window.location.hash) {
-				this._spotifyAuth();
-			} else {
-				const sSpotifyParameters = this._getReturnedParametersFromSpotify(window.location.hash);
-				this.getView().getModel("user").setProperty("/spotifyParameters", sSpotifyParameters);
-				this._spotifyAPICall();
-			}
-		},
+      _getReturnedParametersFromSpotify: (hash) => {
+        const sStringAfterHash = hash.substring(1)
+        const sParamsInUrl = sStringAfterHash.split('&')
+        const sParamsSplitUp = sParamsInUrl.reduce((accumulator, currentValue) => {
+          const [key, value] = currentValue.split('=')
+          accumulator[key] = value
+          return accumulator
+        }, {})
 
-		_getReturnedParametersFromSpotify: function(hash) {
-			const sStringAfterHash = hash.substring(1);
-			const sParamsInUrl = sStringAfterHash.split("&");
-			const sParamsSplitUp = sParamsInUrl.reduce((accumulator, currentValue) => {
-				const [key, value] = currentValue.split("=");
-				accumulator[key] = value;
-				return accumulator;
-			}, {});
+        return sParamsSplitUp
+      },
 
-			return sParamsSplitUp;
-		},
+      _buildDynamicFilterBar: (response) => {
+        const oFilterBar = INSTANCE.byId('api_filter_bar')
+        let oFilterItem, oControl
 
-		_buildDynamicFilterBar: function(response) {
-			var oFilterBar = this.byId("api_filter_bar");
-			var oFilterItem, oControl;
-			
-			for(const filter of response.oSource.oData.filters) {
-				oFilterItem = new sap.ui.comp.filterbar.FilterGroupItem({
-					groupName: "Unique",
-					name: filter.id,
-					label: filter.name,
-					partOfCurrentVariant: true,
-					visibleInFilterBar: true,
-				});
+        for (const filter of response.oSource.oData.filters) {
+          oFilterItem = new sap.ui.comp.filterbar.FilterGroupItem({
+            groupName: 'Unique',
+            name: filter.id,
+            label: filter.name,
+            partOfCurrentVariant: true,
+            visibleInFilterBar: true
+          })
 
-				if(filter.values) {
-					oControl = new sap.m.ComboBox(filter.id, {
-						selectedKey: `{filters>/${filter.id}}`
-					});
+          if (filter.values) {
+            oControl = new sap.m.ComboBox(filter.id, { selectedKey: `{filters>/${filter.id}}` })
+            for (const option of filter.values) {
+              oControl.addItem(
+                new sap.ui.core.Item({
+                  key: option.value,
+                  text: option.name
+                })
+              )
+            }
+          } else {
+            const map = {
+              STRING: 'text',
+              INTEGER: 'Number'
+            }
+            let type = map[filter.validation.primitiveType] ?? map.text
+            const value = `{filters>/${filter.id}}`
+            const valueFormat = 'yyyy-MM-ddTHH:mm:ss'
 
-					for(const option of filter.values) {
-						oControl.addItem( new sap.ui.core.Item({
-							key: option.value,
-							text: option.name
-						}) );
-					}
-				} else {
-					var sInputType;
+            filter.validation.entityType === 'DATE_TIME'
+              ? (oControl = new sap.m.DateTimePicker(filter.id, { value, valueFormat }))
+              : (oControl = new sap.m.Input(filter.id, { type, value }))
+          }
 
-					switch(filter.validation.primitiveType) {
-						case "STRING": 
-							sInputType = "Text";
-							break;
-						case "INTEGER":
-							sInputType = "Number";
-							break;
-						default:
-							sInputType = "Text";
-					}
+          oControl.attachChange(INSTANCE.onFBSearch, this)
+          oFilterItem.setControl(oControl)
+          oFilterBar.addFilterGroupItem(oFilterItem)
+        }
+      },
+      onFBSearch: () => INSTANCE._spotifyAPICall(),
 
-					if(filter.validation.entityType == "DATE_TIME")
-						oControl = new sap.m.DateTimePicker(filter.id, {
-							value: `{filters>/${filter.id}}`,
-							valueFormat: "yyyy-MM-ddTHH:mm:ss"
-						});
-					else
-						oControl = new sap.m.Input(filter.id, {
-							type: sInputType,
-							value: `{filters>/${filter.id}}`
-						});
-				}
+      _spotifyAPICall: async () => {
+        setViewProperty('/busy', true)
 
-				oControl.attachChange(this.onFBSearch, this);
-				oFilterItem.setControl(oControl);
-				oFilterBar.addFilterGroupItem(oFilterItem);
-			}
-		},
+        const oModelFilters = getModel('filters')
+        const data = {}
 
-		onFBSearch: function(oEvent) {
-			this._spotifyAPICall();
-		},
+        // [TODO] Melhorar forma de fazer isso
+        if (oModelFilters.getProperty('/locale')) data['locale'] = oModelFilters.getProperty('/locale')
 
-		_spotifyAPICall: function() {
-			this.getView().getModel("view").setProperty("/busy", true);
+        if (oModelFilters.getProperty('/country')) data['country'] = oModelFilters.getProperty('/country')
 
-			const oModelFilters = this.getView().getModel("filters");
-			const oFilterParams = {};
+        if (oModelFilters.getProperty('/limit')) data['limit'] = oModelFilters.getProperty('/limit')
 
-			// [TODO] Melhorar forma de fazer isso
-			if(oModelFilters.getProperty("/locale"))
-				oFilterParams["locale"] = oModelFilters.getProperty("/locale");
+        if (oModelFilters.getProperty('/timestamp')) data['timestamp'] = oModelFilters.getProperty('/timestamp')
 
-			if(oModelFilters.getProperty("/country"))
-				oFilterParams["country"] = oModelFilters.getProperty("/country");
+        if (oModelFilters.getProperty('/offset')) data['offset'] = oModelFilters.getProperty('/offset')
 
-			if(oModelFilters.getProperty("/limit"))
-				oFilterParams["limit"] = oModelFilters.getProperty("/limit");
+        try {
+          const token = getModel('user').getProperty('/spotifyParameters').access_token
+          const response = await fetch(Settings.FEATURED_PLAYLISTS_URL, {
+            headers: { Authorization: `Bearer ${token}` },
+            data
+          })
+          const { playlists } = await response.json()
+          setModel(playlists, 'playlists')
+        } catch (error) {
+          setModel({}, 'playlists')
+          MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
+        }
+        setViewProperty('/busy', false)
+      },
 
-			if(oModelFilters.getProperty("/timestamp"))
-				oFilterParams["timestamp"] = oModelFilters.getProperty("/timestamp");
+      onSearch: (oEvent) => {
+        // First reset current filters
+        INSTANCE.searchFilters = []
 
-			if(oModelFilters.getProperty("/offset"))
-				oFilterParams["offset"] = oModelFilters.getProperty("/offset");
+        // add filter for search
+        INSTANCE.sSearchQuery = oEvent.getSource().getValue()
+        if (INSTANCE.sSearchQuery && INSTANCE.sSearchQuery.length > 0) {
+          const filter = new Filter('name', FilterOperator.Contains, INSTANCE.sSearchQuery)
+          INSTANCE.searchFilters.push(filter)
+        }
 
-			$.ajax({
-				url: "https://api.spotify.com/v1/browse/featured-playlists",
-				method: "GET",
-				headers: {
-					"Authorization": `Bearer ${this.getView().getModel("user").getProperty("/spotifyParameters").access_token}`
-				},
-				data: oFilterParams,
-				success: function(sResult) {
-					this.getView().setModel(new JSONModel(sResult.playlists), "playlists");
-					this.getView().getModel("view").setProperty("/busy", false);
-				}.bind(this),
-				statusCode: {
-					400: function() {
-						this.getView().setModel(new JSONModel({}), "playlists");
-						MessageToast.show("Erro ao buscar informações para os parâmetros informados.");
-						this.getView().getModel("view").setProperty("/busy", false);
-					}.bind(this),
-					401: function() {
-						alert( "Erro ao se autenticar no Spotify." );
-						const redirectUri = "https://spotify-featured-playlists.cfapps.us10.hana.ondemand.com/webapp/";
-						window.location = redirectUri;
-					}
-				}
-			});
-		},
+        INSTANCE._applyListFilters()
+      },
 
-		onSearch: function(oEvent) {
-			// First reset current filters
-			this.aSearchFilters = [];
+      _applyListFilters: () => {
+        const oList = INSTANCE.byId('playlistList')
+        const oBinding = oList.getBinding('items')
 
-			// add filter for search
-			this.sSearchQuery = oEvent.getSource().getValue();
-			if (this.sSearchQuery && this.sSearchQuery.length > 0) {
-				var filter = new Filter("name", FilterOperator.Contains, this.sSearchQuery);
-				this.aSearchFilters.push(filter);
-			}
+        oBinding.filter(INSTANCE.searchFilters, 'playlists')
 
-			this._applyListFilters();
-		},
+        let filterText
+        if (INSTANCE.sSearchQuery) {
+          const oResourceBundle = getModel('i18n').getResourceBundle()
+          filterText = oResourceBundle.getText('itemsContaining', [INSTANCE.sSearchQuery])
+        }
 
-		_applyListFilters: function() {
-			var oList = this.byId("playlistList");
-			var oBinding = oList.getBinding("items");
+        setViewProperty('/filterText', filterText)
+      },
 
-			oBinding.filter(this.aSearchFilters, "playlists");
-
-			var sI18nKey;
-			if (this.sSearchQuery) {
-				sI18nKey = "itemsContaining";
-			}
-
-			var sFilterText;
-			if (sI18nKey) {
-				var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-				sFilterText = oResourceBundle.getText(sI18nKey, [this.sSearchQuery]);
-			}
-
-			this.getView().getModel("view").setProperty("/filterText", sFilterText);
-		},
-
-		_spotifyAuth: function(oEvent) {
-			const endpointUrl = "https://accounts.spotify.com/authorize";
-			const clientId = "16e8f02bf37d4aa9abf7d881e396733e";
-			const redirectUri = "http://spotify-featured-playlists.cfapps.us10.hana.ondemand.com/webapp/";
-			
-			window.location = `${endpointUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token`;
-		}
-
-	});
-
-});
+      _spotifyAuth: () => {
+        window.location = `${Settings.SSO_AUTHORIZE_ENDPOINT}?client_id=${Settings.CLIENT_ID}&redirect_uri=${Settings.REDIRECT_URI}&response_type=token`
+      }
+    })
+  }
+)

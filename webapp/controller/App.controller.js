@@ -15,9 +15,7 @@ sap.ui.define(
     const { Settings } = Constants
     const getModel = (model) => INSTANCE.getView().getModel(model)
     const setModel = (value, model) => INSTANCE.getView().setModel(new JSONModel(value), model)
-    const setViewProperty = (prop, value) => getModel('view').setProperty(prop, value)
-    const setFilters = () => setModel(Settings.MOCK_FILTERS_URI, 'filters')
-    const setView = () => setModel(Settings.MOCK_FILTERS_URI, 'view')
+    const setModelProperty = (model, prop, value) => getModel(model).setProperty(prop, value)
 
     return Controller.extend('spotifyfeaturedplaylists.controller.App', {
       onInit: function () {
@@ -26,8 +24,9 @@ sap.ui.define(
         INSTANCE.searchFilters = []
         INSTANCE.aTabFilters = []
 
-        setView({ isMobile: Device.browser.mobile, busy: false })
-        setFilters(Settings.MOCK_FILTERS_URI)
+        setModel({ isMobile: Device.browser.mobile, busy: false }, 'view')
+        setModel(Settings.MOCK_FILTERS_URI, 'filters')
+
         getModel('filters').attachRequestCompleted(INSTANCE._buildDynamicFilterBar, this)
 
         if (!window.location.hash) {
@@ -93,38 +92,40 @@ sap.ui.define(
           oFilterBar.addFilterGroupItem(oFilterItem)
         }
       },
+
       onFBSearch: () => INSTANCE._spotifyAPICall(),
 
       _spotifyAPICall: async () => {
-        setViewProperty('/busy', true)
+        setModelProperty('view', '/busy', true)
 
         const oModelFilters = getModel('filters')
         const data = {}
 
-        // [TODO] Melhorar forma de fazer isso
         if (oModelFilters.getProperty('/locale')) data['locale'] = oModelFilters.getProperty('/locale')
-
         if (oModelFilters.getProperty('/country')) data['country'] = oModelFilters.getProperty('/country')
-
         if (oModelFilters.getProperty('/limit')) data['limit'] = oModelFilters.getProperty('/limit')
-
         if (oModelFilters.getProperty('/timestamp')) data['timestamp'] = oModelFilters.getProperty('/timestamp')
-
         if (oModelFilters.getProperty('/offset')) data['offset'] = oModelFilters.getProperty('/offset')
+
+        const searchParams = new URLSearchParams(data)
 
         try {
           const token = getModel('user').getProperty('/spotifyParameters').access_token
-          const response = await fetch(Settings.FEATURED_PLAYLISTS_URL, {
+          const response = await fetch(Settings.FEATURED_PLAYLISTS_URL + "?" + searchParams, {
             headers: { Authorization: `Bearer ${token}` },
             data
           })
           const { playlists } = await response.json()
           setModel(playlists, 'playlists')
+
+          if(!response.ok)
+            MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
+
         } catch (error) {
           setModel({}, 'playlists')
           MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
         }
-        setViewProperty('/busy', false)
+        setModelProperty('view', '/busy', false)
       },
 
       onSearch: (oEvent) => {

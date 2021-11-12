@@ -111,16 +111,14 @@ sap.ui.define(
 
         try {
           const token = getModel('user').getProperty('/spotifyParameters').access_token
-          const response = await fetch(Settings.FEATURED_PLAYLISTS_URL + "?" + searchParams, {
+          const response = await fetch(Settings.FEATURED_PLAYLISTS_URL + '?' + searchParams, {
             headers: { Authorization: `Bearer ${token}` },
             data
           })
           const { playlists } = await response.json()
           setModel(playlists, 'playlists')
 
-          if(!response.ok)
-            MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
-
+          if (!response.ok) MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
         } catch (error) {
           setModel({}, 'playlists')
           MessageToast.show('Erro ao buscar informações para os parâmetros informados.')
@@ -148,13 +146,15 @@ sap.ui.define(
 
         oBinding.filter(INSTANCE.searchFilters, 'playlists')
 
+        /*
         let filterText
         if (INSTANCE.sSearchQuery) {
-          const oResourceBundle = getModel('i18n').getResourceBundle()
+         const oResourceBundle = getModel('i18n').getResourceBundle()
           filterText = oResourceBundle.getText('itemsContaining', [INSTANCE.sSearchQuery])
         }
 
         setViewProperty('/filterText', filterText)
+        */
       },
 
       _spotifyAuth: () => {

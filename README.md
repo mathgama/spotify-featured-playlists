@@ -1,34 +1,31 @@
-## Application Details
-|               |
-| ------------- |
-|**Generation Date and Time**<br>Mon Jul 12 2021 20:40:17 GMT-0300 (Brasilia Standard Time)|
-|**App Generator**<br>@sap/generator-fiori|
-|**App Generator Version**<br>1.2.4|
-|**Generation Platform**<br>Visual Studio Code|
-|**Floorplan Used**<br>simple|
-|**Service Type**<br>None|
-|**Service URL**<br>N/A
-|**Module Name**<br>spotify-featured-playlists|
-|**Application Title**<br>Spotify Featured Playlists|
-|**Namespace**<br>|
-|**UI5 Theme**<br>sap_fiori_3|
-|**UI5 Version**<br>Latest|
-|**Enable Telemetry**<br>True|
+# Spotify Featured Playlists
 
-## spotify-featured-playlists
+This is an app that lists spotify featured playlists and enable the user to apply some simple filters to the API.
 
-Spotify Featured Playlists
+![preview](./assets/preview.gif)
 
-### Starting the generated app
+## Architecture
 
--   This app has been generated using the SAP Fiori tools - App Generator, as part of the SAP Fiori tools suite.  In order to launch the generated app, simply run the following from the generated app root folder:
+This app was constructed using SAP UI5 as a framework and it consumes Spotify's API to fetch [featured playlists](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-featured-playlists).
+
+## How to start
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/)
+
+### Installation
+
+- To run the application, first clone the repository to your local machine, and then run the following command in the created folder:
 
 ```
-    npm start
+yarn install
 ```
 
-#### Pre-requisites:
+- Then the app can be started with the command:
 
-1. Active NodeJS LTS (Long Term Support) version and associated supported NPM version.  (See https://nodejs.org)
+```
+yarn start
+```
 
-
+- _Important_: The application needs an "client ID" from an project created at "[Spotify for Developers](https://developer.spotify.com/)" to work. My own client ID is configured in the project right now, but that means I need to authorize beforehand any email that will try to sign into the app. Feel free to contact me if you want to. But another option is to create your own "client ID" key and provide it in the "/util/Constants.js" file.

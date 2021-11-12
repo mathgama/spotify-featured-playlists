@@ -28,4 +28,4 @@ yarn install
 yarn start
 ```
 
-- _Important_: The application needs an "client ID" from an project created at [Spotify for Developers](https://developer.spotify.com/) to work. My own client ID is configured in the project right now, but that means I need to authorize beforehand any email that will try to sign into the app. Feel free to contact me if you want to. But another option is to create your own "client ID" key and provide it in the "/webapp//util/Constants.js" file.
+- _Important_: The application needs a "client ID" from a project created at [Spotify for Developers](https://developer.spotify.com/) to work. My own client ID is configured in the project right now, but that means I need to authorize beforehand any email that will try to sign into the app. Feel free to contact me if you want to. But another option is to create your own "client ID" key and provide it in the "/webapp//util/Constants.js" file.
